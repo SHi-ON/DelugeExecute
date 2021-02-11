@@ -1,7 +1,6 @@
+#!/usr/bin/env python
 from sys import argv
 from syslog import syslog
-
-syslog('SHi-ON deluge execute test: the script started running...')
-
-for arg in argv:
-	syslog(arg)
+syslog('deluge test: the script started running')
+for arg in argv[1:]:
+    syslog(arg)
