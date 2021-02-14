@@ -23,7 +23,8 @@ arg_path = arg_path.strip()
 #os.system('su centos')
 #syslog('user id: ' + str(os.getuid()))
 
-# os.system('rsync -arvzh {0}/{1} shi-on@68.129.239.249:/Users/shi-on/Downloads/d'.format(arg_path, arg_name))
+# os.system('rsync -arvzh {0}/{1} {user}@{host}:{path}'.format(
+#     arg_path, arg_name, user='', host='', path=''))
 
 # syslog('finished uploading to the local machine')
 
