@@ -5,19 +5,44 @@ from watchdog.observers import Observer
 
 
 def on_created(event):
-    print(f"hey, {event.src_path} has been created!\n")
+    """
+    On created event handler.
+    useful attribute: event.src_path
+
+    :param event: event
+    """
+    pass
 
 
 def on_deleted(event):
-    print(f"what the f**k! Someone deleted {event.src_path}!\n")
+    """
+    On deleted event handler.
+    useful attribute: event.src_path
+
+    :param event: event
+    """
+    pass
 
 
 def on_modified(event):
-    print(f"hey buddy, {event.src_path} has been modified\n")
+    """
+    On modified event handler.
+    useful attribute: event.src_path
+
+    :param event: event
+    """
+    pass
 
 
 def on_moved(event):
-    print(f"ok ok ok, someone moved {event.src_path} to {event.dest_path}\n")
+    """
+    On moved event handler.
+    useful attributes: event.src_path, event.dest_path
+
+    :param event: event
+    """
+    # print(f"ok ok ok, someone moved {event.src_path} to {event.dest_path}\n")
+    pass
 
 
 if __name__ == '__main__':
