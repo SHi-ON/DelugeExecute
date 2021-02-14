@@ -25,7 +25,7 @@ arg_path = arg_path.strip()
 
 # os.system('rsync -arvzh {0}/{1} shi-on@68.129.239.249:/Users/shi-on/Downloads/d'.format(arg_path, arg_name))
 
-syslog('finished uploading to the local machine')
+# syslog('finished uploading to the local machine')
 
 sl.closelog()
 
