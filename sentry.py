@@ -32,7 +32,7 @@ if __name__ == '__main__':
 
     observer = Observer()
     observer.schedule(event_handler=event_handler,
-                      path='.',
+                      path='./buffer',
                       recursive=True)
 
     observer.start()
