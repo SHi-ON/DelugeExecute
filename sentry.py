@@ -1,4 +1,5 @@
 import time
+import os
 
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
@@ -11,7 +12,8 @@ def on_created(event):
 
     :param event: event
     """
-    pass
+    command = 'rsync -Parvzh * shi-on@68.129.239.249:/Users/shi-on/Downloads/d'
+    os.system(command)
 
 
 def on_deleted(event):
@@ -41,11 +43,11 @@ def on_moved(event):
 
     :param event: event
     """
-    # print(f"ok ok ok, someone moved {event.src_path} to {event.dest_path}\n")
     pass
 
 
 if __name__ == '__main__':
+
     event_handler = PatternMatchingEventHandler(patterns='*',
                                                 ignore_patterns='',
                                                 ignore_directories=False,
