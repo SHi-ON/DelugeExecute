@@ -1,6 +1,5 @@
-import time
-import os
 import subprocess
+import time
 
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
@@ -49,6 +48,7 @@ def on_moved(event):
 
 if __name__ == '__main__':
 
+    # setting the event handler
     event_handler = PatternMatchingEventHandler(patterns='*',
                                                 ignore_patterns='',
                                                 ignore_directories=False,
@@ -58,6 +58,7 @@ if __name__ == '__main__':
     event_handler.on_modified = on_modified
     event_handler.on_moved = on_moved
 
+    # schedule the observer
     observer = Observer()
     observer.schedule(event_handler=event_handler,
                       path='./buffer',
