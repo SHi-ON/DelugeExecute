@@ -14,6 +14,7 @@ def on_created(event):
     :param event: event
     """
     global scheduler
+    print('path is:', event.src_path)
 
     scheduler.enter(5, 1, rsync_files, kwargs={'file_name': event.src_path})
     scheduler.run()
@@ -50,7 +51,7 @@ def on_moved(event):
 
 
 def rsync_files(file_name=None):
-    file_path = ('buffer' + '/' + file_name) if file_name else 'buffer'
+    file_path = file_name or 'buffer'
 
     args = ['rsync',
             '-Parvzh',
