@@ -13,10 +13,8 @@ def on_created(event):
 
     :param event: event
     """
-    command = 'rsync -Parvzh * shi-on@68.129.239.249:/Users/shi-on/Downloads/d'
-    # subprocess.system(command)
-    subprocess.call(['ls', '-lah'])
-    subprocess.call(['rsync', '-Parvzh', '*', 'shi-on@68.129.239.249:/Users/shi-on/Downloads/d'])
+    subprocess.call(['rsync', '-Parvzh', 'buffer',
+                     'shi-on@68.129.239.249:~/Downloads/d'])
 
 
 def on_deleted(event):
