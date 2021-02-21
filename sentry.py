@@ -14,7 +14,6 @@ def on_created(event):
     :param event: event
     """
     global scheduler
-    print('path is:', event.src_path)
 
     scheduler.enter(5, 1, rsync_files, kwargs={'file_name': event.src_path})
     scheduler.run()
@@ -80,7 +79,9 @@ if __name__ == '__main__':
 
     observer.start()
     print('Observer started...')
+
     scheduler = sched.scheduler(time.time, time.sleep)
+
     try:
         while True:
             time.sleep(1)
