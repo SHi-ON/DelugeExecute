@@ -13,8 +13,10 @@ def on_created(event):
 
     :param event: event
     """
-    subprocess.call(['rsync', '-Parvzh', 'buffer',
-                     'shi-on@68.129.239.249:~/Downloads/d'])
+    global scheduler
+
+    scheduler.enter(5, 1, rsync_files, kwargs={'file_name': event.src_path})
+    scheduler.run()
 
 
 def on_deleted(event):
@@ -47,17 +49,14 @@ def on_moved(event):
     pass
 
 
-def schedule_job():
+def rsync_files(file_name=None):
+    file_path = ('buffer' + '/' + file_name) if file_name else 'buffer'
 
-    def print_time(a='defffault'):
-        print('from print time', time.time(), a)
-
-    s.enter(10, 1, print_time)
-    s.enter(3, 2, print_time)
-    s.enter(1, 2, print_time)
-    s.run()
-
-    s._queue
+    args = ['rsync',
+            '-Parvzh',
+            file_path,
+            'shi-on@68.129.239.249:~/Downloads/d']
+    subprocess.call(args)
 
 
 if __name__ == '__main__':
@@ -81,7 +80,6 @@ if __name__ == '__main__':
     observer.start()
     print('Observer started...')
     scheduler = sched.scheduler(time.time, time.sleep)
-
     try:
         while True:
             time.sleep(1)
