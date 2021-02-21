@@ -1,3 +1,4 @@
+import sched
 import subprocess
 import time
 
@@ -46,6 +47,19 @@ def on_moved(event):
     pass
 
 
+def schedule_job():
+
+    def print_time(a='defffault'):
+        print('from print time', time.time(), a)
+
+    s.enter(10, 1, print_time)
+    s.enter(3, 2, print_time)
+    s.enter(1, 2, print_time)
+    s.run()
+
+    s._queue
+
+
 if __name__ == '__main__':
 
     # setting the event handler
@@ -62,10 +76,12 @@ if __name__ == '__main__':
     observer = Observer()
     observer.schedule(event_handler=event_handler,
                       path='./buffer',
-                      recursive=True)
+                      recursive=False)
 
     observer.start()
     print('Observer started...')
+    scheduler = sched.scheduler(time.time, time.sleep)
+
     try:
         while True:
             time.sleep(1)
