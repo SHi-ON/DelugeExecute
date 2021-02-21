@@ -1,5 +1,6 @@
 import time
 import os
+import subprocess
 
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
@@ -13,7 +14,9 @@ def on_created(event):
     :param event: event
     """
     command = 'rsync -Parvzh * shi-on@68.129.239.249:/Users/shi-on/Downloads/d'
-    os.system(command)
+    # subprocess.system(command)
+    subprocess.call(['ls', '-lah'])
+    subprocess.call(['rsync', '-Parvzh', '*', 'shi-on@68.129.239.249:/Users/shi-on/Downloads/d'])
 
 
 def on_deleted(event):
