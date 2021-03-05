@@ -52,7 +52,9 @@ def on_moved(event):
 def rsync_files(file_name=None):
     file_path = file_name or 'buffer'
 
-    args = ['rsync',
+    args = ['sudo',
+	    'rsync',
+	    '--remove-source-files',
             '-Parvzh',
             file_path,
             'shi-on@68.129.239.249:~/Downloads/d']
