@@ -9,3 +9,6 @@
  * supports all three events. Try to test with Add event.
  * https://github.com/SHi-ON/DelugeExecute
  * see the [RHEL, CentOS] system log at `sudo tail -f /var/log/messages`
+
+rsync without password:
+generate key-gen for user __root__, not the current user!
