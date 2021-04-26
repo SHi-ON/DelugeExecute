@@ -15,7 +15,7 @@ def on_created(event):
     """
     global scheduler
 
-    scheduler.enter(5, 1, rsync_files, kwargs={'file_name': event.src_path})
+    scheduler.enter(300, 1, rsync_files, kwargs={'file_name': event.src_path})
     scheduler.run()
 
 
@@ -53,8 +53,8 @@ def rsync_files(file_name=None):
     file_path = file_name or 'buffer'
 
     args = ['sudo',
-	    'rsync',
-	    '--remove-source-files',
+            'rsync',
+            '--remove-source-files',
             '-Parvzh',
             file_path,
             'shi-on@70.18.8.224:~/Downloads/d']
