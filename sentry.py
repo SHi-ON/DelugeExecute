@@ -6,6 +6,29 @@ from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
 
 
+def rsync_files(file_name=None):
+    file_path = file_name or 'buffer'
+
+    args = ['sudo',
+            'rsync',
+            '--remove-source-files',
+            '-Parvzh',
+            file_path,
+            'shi-on@70.18.8.224:~/Downloads/d']
+    subprocess.call(args)
+
+
+def remove_residues(file_name):
+    if file_name:
+        args = ['rm',
+                '-rf',
+                file_name]
+        subprocess.call(args)
+        print('files removed:', file_name)
+    else:
+        print('cannot remove files:', file_name)
+
+
 def on_created(event):
     """
     On created event handler.
@@ -15,7 +38,10 @@ def on_created(event):
     """
     global scheduler
 
-    scheduler.enter(300, 1, rsync_files, kwargs={'file_name': event.src_path})
+    scheduler.enter(300, 1, rsync_files,
+                    kwargs={'file_name': event.src_path})
+    scheduler.enter(60, 1, remove_residues,
+                    kwargs={'file_name': event.src_path})
     scheduler.run()
 
 
@@ -47,18 +73,6 @@ def on_moved(event):
     :param event: event
     """
     pass
-
-
-def rsync_files(file_name=None):
-    file_path = file_name or 'buffer'
-
-    args = ['sudo',
-            'rsync',
-            '--remove-source-files',
-            '-Parvzh',
-            file_path,
-            'shi-on@70.18.8.224:~/Downloads/d']
-    subprocess.call(args)
 
 
 if __name__ == '__main__':
