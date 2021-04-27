@@ -1,3 +1,4 @@
+import os
 import sched
 import subprocess
 import time
@@ -19,6 +20,15 @@ def rsync_files(file_name=None):
 
 
 def remove_residues(file_name):
+    global scheduler
+
+    total_size = sum(os.path.getsize(f)
+                     for f in os.listdir(file_name))
+    if total_size > 500_000:
+        scheduler.enter(300, 1, remove_residues,
+                        kwargs={'file_name': file_name})
+        return
+
     if file_name:
         args = ['rm',
                 '-rf',
@@ -38,9 +48,9 @@ def on_created(event):
     """
     global scheduler
 
-    scheduler.enter(300, 1, rsync_files,
+    scheduler.enter(150, 1, rsync_files,
                     kwargs={'file_name': event.src_path})
-    scheduler.enter(60, 1, remove_residues,
+    scheduler.enter(750, 1, remove_residues,
                     kwargs={'file_name': event.src_path})
     scheduler.run()
 
