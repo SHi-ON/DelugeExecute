@@ -50,8 +50,11 @@ def on_created(event):
 
     scheduler.enter(150, 1, rsync_files,
                     kwargs={'file_name': event.src_path})
+    print('rsync scheduled:', event.src_path)
     scheduler.enter(750, 1, remove_residues,
                     kwargs={'file_name': event.src_path})
+    print('remove remaining files scheduled:', event.src_path)
+
     scheduler.run()
 
 
@@ -62,7 +65,7 @@ def on_deleted(event):
 
     :param event: event
     """
-    pass
+    print('delete event captured on', event.src_path)
 
 
 def on_modified(event):
