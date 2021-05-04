@@ -1,9 +1,42 @@
+import os
 import sched
 import subprocess
 import time
 
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
+
+
+def rsync_files(file_name=None):
+    file_path = file_name or 'buffer'
+
+    args = ['sudo',
+            'rsync',
+            '--remove-source-files',
+            '-Parvzh',
+            file_path,
+            'shi-on@70.18.8.224:~/Downloads/d']
+    subprocess.call(args)
+
+
+def remove_residues(file_name):
+    global scheduler
+
+    total_size = sum(os.path.getsize(f)
+                     for f in os.listdir(file_name))
+    if total_size > 500_000:
+        scheduler.enter(300, 1, remove_residues,
+                        kwargs={'file_name': file_name})
+        return
+
+    if file_name:
+        args = ['rm',
+                '-rf',
+                file_name]
+        subprocess.call(args)
+        print('files removed:', file_name)
+    else:
+        print('cannot remove files:', file_name)
 
 
 def on_created(event):
@@ -15,7 +48,10 @@ def on_created(event):
     """
     global scheduler
 
-    scheduler.enter(5, 1, rsync_files, kwargs={'file_name': event.src_path})
+    scheduler.enter(150, 1, rsync_files,
+                    kwargs={'file_name': event.src_path})
+    scheduler.enter(750, 1, remove_residues,
+                    kwargs={'file_name': event.src_path})
     scheduler.run()
 
 
@@ -47,18 +83,6 @@ def on_moved(event):
     :param event: event
     """
     pass
-
-
-def rsync_files(file_name=None):
-    file_path = file_name or 'buffer'
-
-    args = ['sudo',
-	    'rsync',
-	    '--remove-source-files',
-            '-Parvzh',
-            file_path,
-            'shi-on@70.18.8.224:~/Downloads/d']
-    subprocess.call(args)
 
 
 if __name__ == '__main__':
