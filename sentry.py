@@ -21,9 +21,12 @@ def rsync_files(file_name=None):
 
 def remove_residues(file_name):
     global scheduler
+    
+    for path, dirs, files in os.walk(file_name):
+        for f in files:
+            file_path = os.path.join(path, f)
+            total_size += os.path.getsize(file_path)
 
-    total_size = sum(os.path.getsize(f)
-                     for f in os.listdir(file_name))
     if total_size > 500_000:
         scheduler.enter(300, 1, remove_residues,
                         kwargs={'file_name': file_name})
