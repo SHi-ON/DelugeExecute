@@ -31,9 +31,7 @@ def remove_residues(file_name):
     if total_size > 500_000:
         scheduler.enter(300, 1, remove_residues,
                         kwargs={'file_name': file_name})
-        return
-
-    if file_name:
+    elif file_name:
         args = ['rm',
                 '-rf',
                 file_name]
