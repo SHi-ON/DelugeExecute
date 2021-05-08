@@ -21,7 +21,8 @@ def rsync_files(file_name=None):
 
 def remove_residues(file_name):
     global scheduler
-    
+   
+    total_size = 0
     for path, dirs, files in os.walk(file_name):
         for f in files:
             file_path = os.path.join(path, f)
