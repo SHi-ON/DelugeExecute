@@ -15,7 +15,7 @@ def rsync_files(file_name=None):
             '--remove-source-files',
             '-Parvzh',
             file_path,
-            'shi-on@70.18.8.224:~/Downloads/d']
+            'shi-on@68.129.234.107:~/Downloads/d']
     subprocess.call(args)
 
 
