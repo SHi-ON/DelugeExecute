@@ -14,7 +14,7 @@ DEST_PATH = '~/Downloads/buffer/'
 
 def del_path(p):
     try:
-        os.rmdir(p)
+        shutil.rmtree(p)
     except NotADirectoryError:
         os.remove(p)
 
