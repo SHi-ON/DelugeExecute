@@ -1,7 +1,7 @@
 import os
+import shutil
 import subprocess
 import time
-import shutil
 
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
