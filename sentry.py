@@ -1,16 +1,15 @@
 import os
 import subprocess
 import time
+import shutil
 
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
 
 SOURCE_PATH = 'buffer'
 USER = 'shi-on'
-HOST = '68.129.234.107'
+HOST = '73.61.87.104'
 DEST_PATH = '~/Downloads/buffer/'
-
-DEBUG = True
 
 
 def del_path(p):
@@ -68,11 +67,10 @@ class Sync:
         dest = f'{self.user}@{self.host}:{self.dest_path}'
         args = ['sudo',
                 'rsync',
-                '--remove-source-files',
                 '-Parvzh',
                 source,
                 dest]
-        subprocess.call(args)
+        return subprocess.call(args)
 
     def on_created(self, event):
         """
@@ -82,9 +80,12 @@ class Sync:
         :param event: event
         """
         source_path = event.src_path
-        if '+-+' in source_path:
-            path = event.src_path.split('+-+')[0]
-            self.rsync_files(path)
+        if source_path.endswith('+-+'):
+            path = source_path[:source_path.rfind('+-+')]
+            ret = self.rsync_files(path)
+            if ret == 0:
+                shutil.rmtree(path)
+                os.remove(source_path)
 
     def on_deleted(self, event):
         """
