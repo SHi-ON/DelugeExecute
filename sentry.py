@@ -84,7 +84,10 @@ class Sync:
             path = source_path[:source_path.rfind('+-+')]
             ret = self.rsync_files(path)
             if ret == 0:
-                shutil.rmtree(path)
+                try:
+                    shutil.rmtree(path)
+                except NotADirectoryError:
+                    os.rmdir(path)
                 os.remove(source_path)
 
     def on_deleted(self, event):
