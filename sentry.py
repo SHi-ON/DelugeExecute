@@ -2,14 +2,10 @@ import os
 import shutil
 import subprocess
 import time
+from configparser import ConfigParser
 
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
-
-SOURCE_PATH = 'buffer'
-USER = 'shi-on'
-HOST = '73.61.87.104'
-DEST_PATH = '~/Downloads/buffer/'
 
 
 def del_path(p):
@@ -124,7 +120,11 @@ class Sync:
 
 
 if __name__ == '__main__':
-    sync = Sync(SOURCE_PATH, USER, HOST, DEST_PATH)
+    config_parser = ConfigParser()
+    config_parser.read('config.env')
+    configs = config_parser.items(section='sync')
+    configs = dict(configs)
+    sync = Sync(**configs)
     try:
         while True:
             time.sleep(1)
