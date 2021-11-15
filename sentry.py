@@ -83,7 +83,7 @@ class Sync:
                 try:
                     shutil.rmtree(path)
                 except NotADirectoryError:
-                    os.rmdir(path)
+                    os.remove(path)
                 os.remove(source_path)
 
     def on_deleted(self, event):
