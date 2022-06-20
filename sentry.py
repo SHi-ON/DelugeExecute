@@ -61,8 +61,7 @@ class Sync:
 
     def rsync_files(self, source):
         dest = f'{self.user}@{self.host}:{self.dest_path}'
-        args = ['sudo',
-                'rsync',
+        args = ['rsync',
                 '-Parvzh',
                 source,
                 dest]
