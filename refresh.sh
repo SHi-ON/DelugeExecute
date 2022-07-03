@@ -1,3 +1,5 @@
+mkdir -p /home/ubuntu/Development/DelugeExecute/tmp
+
 mv /home/ubuntu/Development/DelugeExecute/buffer/* /home/ubuntu/Development/DelugeExecute/tmp
 
 sleep 1
