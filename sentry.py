@@ -75,15 +75,14 @@ class Sync:
         :param event: event
         """
         source_path = event.src_path
-        if source_path.endswith('+-+'):
-            path = source_path[:source_path.rfind('+-+')]
-            ret = self.rsync_files(path)
-            if ret == 0:
-                try:
-                    shutil.rmtree(path)
-                except NotADirectoryError:
-                    os.remove(path)
-                os.remove(source_path)
+        path = source_path
+        ret = self.rsync_files(path)
+        if ret == 0:
+            try:
+                shutil.rmtree(path)
+            except NotADirectoryError:
+                os.remove(path)
+            os.remove(source_path)
 
     def on_deleted(self, event):
         """
