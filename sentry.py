@@ -75,14 +75,12 @@ class Sync:
         :param event: event
         """
         source_path = event.src_path
-        path = source_path
-        ret = self.rsync_files(path)
+        ret = self.rsync_files(source_path)
         if ret == 0:
             try:
-                shutil.rmtree(path)
+                shutil.rmtree(source_path)
             except NotADirectoryError:
-                os.remove(path)
-            os.remove(source_path)
+                os.remove(source_path)
 
     def on_deleted(self, event):
         """
