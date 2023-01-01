@@ -2,6 +2,7 @@ import datetime
 import logging
 import os
 import pathlib
+import re
 import shutil
 import subprocess
 import time
@@ -21,6 +22,14 @@ SUBTITLE_DIR_NAMES = ['subs', 'subtitle', 'subtitles']
 SUBTITLE_LANGUAGE = 'english'
 
 VIDEO_EXTENSIONS = ['.mp4', '.mkv']
+
+CATEGORY_SHOW = 'show'
+CATEGORY_MOVIE = 'movie'
+CATEGORY_TRANQUILITY = 'tranquility'
+PATTERN_SHOW = re.compile(r'(\.S[0-9]{2}\.)|(\.S[0-9]{2}E[0-9]{2}\.)',
+                          re.IGNORECASE)
+PATTERN_TRANQUILITY = re.compile(r'\.X{3}\.',
+                                 re.IGNORECASE)
 
 
 def is_valid(file_name: str):
@@ -65,23 +74,35 @@ def discover_video_file(dir_path: pathlib.Path):
             return fp
 
 
-def move_subtitle(dir_path: pathlib.Path):
+def move_subtitle(dir_path: pathlib.Path, category: str):
     if not dir_path.is_dir():
-        return
-
-    if not (video_file_path := discover_video_file(dir_path)):
-        logging.warning('video file were not found!')
         return
     if not (subtitles_dir_path := discover_subtitles_dir(dir_path)):
         logging.warning('subtitles directory not found!')
         return
-    if not (subtitle_file_path := discover_subtitle_file(subtitles_dir_path)):
-        logging.warning('subtitle file not found!')
-        return
 
-    t_subtitle_file_path = subtitle_file_path.with_stem(video_file_path.stem)
-    subtitle_file_path.rename(t_subtitle_file_path)
-    t_subtitle_file_path.rename(dir_path / t_subtitle_file_path.name)
+    if category == CATEGORY_SHOW:
+        for dp in subtitles_dir_path.iterdir():
+            if not dp.is_dir():
+                continue
+            subtitle_path = discover_subtitle_file(dp)
+            t_subtitle_path = subtitle_path.with_stem(dp.name)
+            subtitle_path.rename(dir_path / t_subtitle_path.name)
+            shutil.rmtree(dp)
+    elif category == CATEGORY_MOVIE:
+        if not (video_file_path := discover_video_file(dir_path)):
+            logging.warning('video file were not found!')
+            return
+        if not (
+                subtitle_file_path := discover_subtitle_file(
+                    subtitles_dir_path)):
+            logging.warning('subtitle file not found!')
+            return
+
+        t_subtitle_file_path = subtitle_file_path.with_stem(
+            video_file_path.stem)
+        subtitle_file_path.rename(t_subtitle_file_path)
+        t_subtitle_file_path.rename(dir_path / t_subtitle_file_path.name)
 
     shutil.rmtree(subtitles_dir_path)
 
@@ -95,24 +116,45 @@ def get_year_index(name_fields: List[str]):
             continue
 
 
-def format_dir_name(dir_path: Union[str, pathlib.Path]):
+def format_dir_name(dir_path: Union[str, pathlib.Path], category: str):
     dir_path = pathlib.Path(dir_path)
 
     name_fields = dir_path.name.split('.')
-    try:
-        xxx_index = dir_path.name.lower().split('.').index('xxx')
-        studio_name = name_fields[0]
-        video_name = ' '.join(name_fields[4: xxx_index])
-        target_dir_path = dir_path.with_name(f'{studio_name} - {video_name}')
-    except ValueError:
+    if category == CATEGORY_SHOW:
+        return dir_path
+    elif category == CATEGORY_MOVIE:
         if not (year_index := get_year_index(name_fields)):
             logging.warning('year string not found!')
             return dir_path
         name = ' '.join(name_fields[:year_index])
         year = name_fields[year_index]
         target_dir_path = dir_path.with_name(f'{name} ({year})')
-    dir_path.rename(target_dir_path)
-    return target_dir_path
+
+        dir_path.rename(target_dir_path)
+        return target_dir_path
+    elif category == CATEGORY_TRANQUILITY:
+        try:
+            xxx_index = dir_path.name.lower().split('.').index('xxx')
+        except ValueError:
+            logging.warning(f'misclassified as {CATEGORY_TRANQUILITY}')
+            return dir_path
+        studio_name = name_fields[0]
+        video_name = ' '.join(name_fields[4: xxx_index])
+        target_dir_path = dir_path.with_name(f'{studio_name} - {video_name}')
+
+        dir_path.rename(target_dir_path)
+        return target_dir_path
+
+
+def classify(dir_path: Union[str, pathlib.Path]):
+    dir_path = pathlib.Path(dir_path)
+
+    if PATTERN_SHOW.search(dir_path.name):
+        return CATEGORY_SHOW
+    elif get_year_index(dir_path.name.lower().split('.')):
+        return CATEGORY_MOVIE
+    elif PATTERN_TRANQUILITY.search(dir_path.name):
+        return CATEGORY_TRANQUILITY
 
 
 def calculate_path_size(p):
@@ -175,8 +217,9 @@ class Sync:
         :param event: event
         """
         source_path = pathlib.Path(event.src_path)
-        source_path = format_dir_name(source_path)
-        move_subtitle(source_path)
+        category = classify(source_path)
+        source_path = format_dir_name(source_path, category)
+        move_subtitle(source_path, category)
         delete_junks(source_path)
         ret = self.rsync_files(source_path)
         if ret == 0:
