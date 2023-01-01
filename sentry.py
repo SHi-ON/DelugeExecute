@@ -14,13 +14,10 @@ from watchdog.observers import Observer
 JUNK_FILE_NAMES = [
     'rarbg.txt',
     'rarbg_do_not_mirror.exe',
+    'torrent downloaded from rarbg.to.txt',
 ]
 
-SUBTITLE_DIR_NAMES = [
-    'subs',
-    'subtitle',
-    'subtitles',
-]
+SUBTITLE_DIR_NAMES = ['subs', 'subtitle', 'subtitles']
 SUBTITLE_LANGUAGE = 'english'
 
 VIDEO_EXTENSIONS = ['.mp4', '.mkv']
