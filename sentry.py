@@ -40,6 +40,9 @@ def _delete_junk_file(file_path: pathlib.Path):
 
 
 def delete_junks(dir_path: pathlib.Path):
+    if not dir_path.is_dir():
+        _delete_junk_file(dir_path)
+        return
     for fp in dir_path.iterdir():
         _delete_junk_file(fp)
 
@@ -63,6 +66,9 @@ def discover_video_file(dir_path: pathlib.Path):
 
 
 def move_subtitle(dir_path: pathlib.Path):
+    if not dir_path.is_dir():
+        return
+
     if not (video_file_path := discover_video_file(dir_path)):
         logging.warning('video file were not found!')
         return
@@ -226,5 +232,4 @@ def main():
 
 
 if __name__ == '__main__':
-    pass
-    # main()
+    main()
