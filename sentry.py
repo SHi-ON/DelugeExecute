@@ -1,3 +1,4 @@
+import datetime
 import logging
 import os
 import pathlib
@@ -5,6 +6,7 @@ import shutil
 import subprocess
 import time
 from configparser import ConfigParser
+from typing import List, Union
 
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
@@ -77,9 +79,28 @@ def move_subtitle(dir_path: pathlib.Path):
     shutil.rmtree(subtitles_dir_path)
 
 
-source_path = dir_path = pathlib.Path().home() / 'Downloads' / 'buffer' / \
-                         'Wrath.of.Man.2021.1080p.WEBRip.x265-RARBG'
-print(*dir_path.iterdir())
+def get_year_index(name_fields: List[str]):
+    for i, field_ in enumerate(name_fields):
+        try:
+            datetime.datetime.strptime(field_, '%Y')
+            return i
+        except ValueError:
+            continue
+
+
+def format_dir_name(dir_path: Union[str, pathlib.Path]):
+    dir_path = pathlib.Path(dir_path)
+
+    name_fields = dir_path.name.split('.')
+    if not (year_index := get_year_index(name_fields)):
+        logging.warning('year string not found!')
+        return dir_path
+
+    name = ' '.join(name_fields[:year_index])
+    year = name_fields[year_index]
+    target_dir_path = dir_path.with_name(f'{name} ({year})')
+    dir_path.rename(target_dir_path)
+    return target_dir_path
 
 
 def calculate_path_size(p):
@@ -126,11 +147,11 @@ class Sync:
         print('Observer started...')
         return observer
 
-    def rsync_files(self, source):
+    def rsync_files(self, source: Union[str, pathlib.Path]):
         dest = f'{self.user}@{self.host}:{self.dest_path}'
         args = ['rsync',
                 '-Parvzh',
-                source,
+                str(source),
                 dest]
         return subprocess.call(args)
 
@@ -141,12 +162,13 @@ class Sync:
 
         :param event: event
         """
-        source_path = event.src_path
+        source_path = pathlib.Path(event.src_path)
+        source_path = format_dir_name(source_path)
+        move_subtitle(source_path)
+        delete_junks(source_path)
         ret = self.rsync_files(source_path)
         if ret == 0:
             try:
-                move_subtitle(source_path)
-                delete_junks(source_path)
                 shutil.rmtree(source_path)
             except NotADirectoryError:
                 os.remove(source_path)
@@ -198,5 +220,4 @@ def main():
 
 
 if __name__ == '__main__':
-    # main()
-    pass
+    main()
