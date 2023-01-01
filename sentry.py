@@ -93,13 +93,18 @@ def format_dir_name(dir_path: Union[str, pathlib.Path]):
     dir_path = pathlib.Path(dir_path)
 
     name_fields = dir_path.name.split('.')
-    if not (year_index := get_year_index(name_fields)):
-        logging.warning('year string not found!')
-        return dir_path
-
-    name = ' '.join(name_fields[:year_index])
-    year = name_fields[year_index]
-    target_dir_path = dir_path.with_name(f'{name} ({year})')
+    try:
+        xxx_index = dir_path.name.lower().split('.').index('xxx')
+        studio_name = name_fields[0]
+        video_name = ' '.join(name_fields[4: xxx_index])
+        target_dir_path = dir_path.with_name(f'{studio_name} - {video_name}')
+    except ValueError:
+        if not (year_index := get_year_index(name_fields)):
+            logging.warning('year string not found!')
+            return dir_path
+        name = ' '.join(name_fields[:year_index])
+        year = name_fields[year_index]
+        target_dir_path = dir_path.with_name(f'{name} ({year})')
     dir_path.rename(target_dir_path)
     return target_dir_path
 
