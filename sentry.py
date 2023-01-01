@@ -1,4 +1,6 @@
+import logging
 import os
+import pathlib
 import shutil
 import subprocess
 import time
@@ -7,12 +9,77 @@ from configparser import ConfigParser
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
 
+JUNK_FILE_NAMES = [
+    'rarbg.txt',
+    'rarbg_do_not_mirror.exe',
+]
 
-def del_path(p):
-    try:
-        shutil.rmtree(p)
-    except NotADirectoryError:
-        os.remove(p)
+SUBTITLE_DIR_NAMES = [
+    'subs',
+    'subtitle',
+    'subtitles',
+]
+SUBTITLE_LANGUAGE = 'english'
+
+VIDEO_EXTENSIONS = ['.mp4', '.mkv']
+
+
+def is_valid(file_name: str):
+    return file_name.lower() not in JUNK_FILE_NAMES
+
+
+def is_subtitle_dir(dir_name: str):
+    return dir_name.lower() in SUBTITLE_DIR_NAMES
+
+
+def _delete_junk_file(file_path: pathlib.Path):
+    if not is_valid(file_path.name):
+        file_path.unlink()
+    if file_path.is_dir() and not any(file_path.iterdir()):
+        file_path.rmdir()
+
+
+def delete_junks(dir_path: pathlib.Path):
+    for fp in dir_path.iterdir():
+        _delete_junk_file(fp)
+
+
+def discover_subtitles_dir(dir_path: pathlib.Path):
+    for fp in dir_path.iterdir():
+        if fp.is_dir() and is_subtitle_dir(fp.name):
+            return fp
+
+
+def discover_subtitle_file(dir_path: pathlib.Path):
+    for sfp in sorted(dir_path.iterdir()):
+        if SUBTITLE_LANGUAGE in sfp.stem.lower():
+            return sfp
+
+
+def discover_video_file(dir_path: pathlib.Path):
+    for fp in sorted(dir_path.iterdir()):
+        if fp.suffix.lower() in VIDEO_EXTENSIONS:
+            return fp
+
+
+def move_subtitle(dir_path: pathlib.Path):
+    video_file_path = discover_video_file(dir_path)
+    subtitles_dir_path = discover_subtitles_dir(dir_path)
+    subtitle_file_path = discover_subtitle_file(subtitles_dir_path)
+    if not all([video_file_path, subtitles_dir_path, subtitle_file_path]):
+        logging.warning('not all required files/dirs were found!')
+        return
+
+    t_subtitle_file_path = subtitle_file_path.with_stem(video_file_path.stem)
+    subtitle_file_path.rename(t_subtitle_file_path)
+    t_subtitle_file_path.rename(dir_path / t_subtitle_file_path.name)
+
+    shutil.rmtree(subtitles_dir_path)
+
+
+source_path = dir_path = pathlib.Path().home() / 'Downloads' / 'buffer' / \
+                         'Wrath.of.Man.2021.1080p.WEBRip.x265-RARBG'
+print(*dir_path.iterdir())
 
 
 def calculate_path_size(p):
@@ -78,6 +145,8 @@ class Sync:
         ret = self.rsync_files(source_path)
         if ret == 0:
             try:
+                move_subtitle(source_path)
+                delete_junks(source_path)
                 shutil.rmtree(source_path)
             except NotADirectoryError:
                 os.remove(source_path)
@@ -115,7 +184,7 @@ class Sync:
         print('\nObserver stopped\n')
 
 
-if __name__ == '__main__':
+def main():
     config_parser = ConfigParser()
     config_parser.read('config.env')
     configs = config_parser.items(section='sync')
@@ -126,3 +195,8 @@ if __name__ == '__main__':
             time.sleep(1)
     except KeyboardInterrupt:
         sync.close()
+
+
+if __name__ == '__main__':
+    # main()
+    pass
