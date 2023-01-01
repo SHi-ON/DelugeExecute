@@ -24,7 +24,8 @@ VIDEO_EXTENSIONS = ['.mp4', '.mkv']
 
 
 def is_valid(file_name: str):
-    return file_name.lower() not in JUNK_FILE_NAMES
+    return file_name.lower() not in JUNK_FILE_NAMES or \
+        file_name.endswith('.nfo')
 
 
 def is_subtitle_dir(dir_name: str):
