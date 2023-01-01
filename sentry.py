@@ -65,11 +65,14 @@ def discover_video_file(dir_path: pathlib.Path):
 
 
 def move_subtitle(dir_path: pathlib.Path):
-    video_file_path = discover_video_file(dir_path)
-    subtitles_dir_path = discover_subtitles_dir(dir_path)
-    subtitle_file_path = discover_subtitle_file(subtitles_dir_path)
-    if not all([video_file_path, subtitles_dir_path, subtitle_file_path]):
-        logging.warning('not all required files/dirs were found!')
+    if not (video_file_path := discover_video_file(dir_path)):
+        logging.warning('video file were not found!')
+        return
+    if not (subtitles_dir_path := discover_subtitles_dir(dir_path)):
+        logging.warning('subtitles directory not found!')
+        return
+    if not (subtitle_file_path := discover_subtitle_file(subtitles_dir_path)):
+        logging.warning('subtitle file not found!')
         return
 
     t_subtitle_file_path = subtitle_file_path.with_stem(video_file_path.stem)
