@@ -218,8 +218,9 @@ class Sync:
         """
         source_path = pathlib.Path(event.src_path)
         category = classify(source_path)
-        source_path = format_dir_name(source_path, category)
-        move_subtitle(source_path, category)
+        if category:
+            source_path = format_dir_name(source_path, category)
+            move_subtitle(source_path, category)
         delete_junks(source_path)
         ret = self.rsync_files(source_path)
         if ret == 0:
