@@ -12,6 +12,7 @@ if [ "$(pgrep -f sentry.py)" ]; then
 
     echo "# run Sentry"
     nohup nice bash -c "~/miniconda3/envs/WebDev9/bin/python sentry.py" &
+    echo ""
     exit 0
   else
     echo "##### Sentry is already running!!"
@@ -20,5 +21,6 @@ if [ "$(pgrep -f sentry.py)" ]; then
 else
   echo "### run Sentry"
   nohup nice bash -c "~/miniconda3/envs/WebDev9/bin/python sentry.py" &
+  echo ""
   exit 0
 fi
