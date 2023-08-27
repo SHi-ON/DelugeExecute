@@ -13,9 +13,14 @@ from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
 
 JUNK_FILE_NAMES = [
+    # RARBG
     'rarbg.txt',
     'rarbg_do_not_mirror.exe',
     'torrent downloaded from rarbg.to.txt',
+    # YTS
+    'www.yts.re.jpg',
+    'www.yts.mx.jpg',
+    'ytsproxies.com.txt'
 ]
 
 SUBTITLE_DIR_NAMES = ['subs', 'subtitle', 'subtitles']
@@ -202,11 +207,10 @@ class Sync:
         return observer
 
     def rsync_files(self, source: Union[str, pathlib.Path]):
-        dest = f'{self.user}@{self.host}:{self.dest_path}'
-        args = ['rsync',
-                '-Parvzh',
-                str(source),
-                dest]
+        source_path = str(source)
+        destination_path = f'{self.user}@{self.host}:{self.dest_path}'
+        args = ['rsync', '-Parvzh', source_path, destination_path]
+        return subprocess.run(args)
         return subprocess.call(args)
 
     def on_created(self, event):
