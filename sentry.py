@@ -210,7 +210,6 @@ class Sync:
         source_path = str(source)
         destination_path = f'{self.user}@{self.host}:{self.dest_path}'
         args = ['rsync', '-Parvzh', source_path, destination_path]
-        return subprocess.run(args)
         return subprocess.call(args)
 
     def on_created(self, event):
