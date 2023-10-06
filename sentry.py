@@ -20,7 +20,8 @@ JUNK_FILE_NAMES = [
     # YTS
     'www.yts.re.jpg',
     'www.yts.mx.jpg',
-    'ytsproxies.com.txt'
+    'www.yts.am.jpg',
+    'ytsproxies.com.txt',
 ]
 
 SUBTITLE_DIR_NAMES = ['subs', 'subtitle', 'subtitles']
