@@ -81,7 +81,7 @@ def discover_video_file(dir_path: pathlib.Path):
             return fp
 
 
-def move_subtitle(dir_path: pathlib.Path, category: str):
+def move_subtitles(dir_path: pathlib.Path, category: str):
     if not dir_path.is_dir():
         return
     if not (subtitles_dir_path := discover_subtitles_dir(dir_path)):
@@ -151,6 +151,10 @@ def format_dir_name(dir_path: Union[str, pathlib.Path], category: str):
 
         dir_path.rename(target_dir_path)
         return target_dir_path
+    else:
+        target_dir_path = dir_path
+        return target_dir_path
+
 
 
 def classify(dir_path: Union[str, pathlib.Path]):
@@ -223,10 +227,11 @@ class Sync:
         """
         source_path = pathlib.Path(event.src_path)
         category = classify(source_path)
-        if category:
-            source_path = format_dir_name(source_path, category)
-            move_subtitle(source_path, category)
+
+        source_path = format_dir_name(source_path, category)
+        move_subtitles(source_path, category)
         delete_junks(source_path)
+
         ret = self.rsync_files(source_path)
         if ret == 0:
             try:
