@@ -184,10 +184,11 @@ def calculate_path_size(p):
 
 
 class Sync:
-    def __init__(self, source_path, user, host, dest_path):
+    def __init__(self, source_path, user, host, port, dest_path):
         self.source_path = source_path
         self.user = user
         self.host = host
+        self.port = port
         self.dest_path = dest_path
         self.observer = self.__init_observer()
 
@@ -215,7 +216,8 @@ class Sync:
     def rsync_files(self, source: Union[str, pathlib.Path]):
         source_path = str(source)
         destination_path = f'{self.user}@{self.host}:{self.dest_path}'
-        args = ['rsync', '-Parvzh', source_path, destination_path]
+        ssh_command = f'ssh -p {self.port}'
+        args = ['rsync', '-Parvzh', '-e', ssh_command, source_path, destination_path]
         return subprocess.call(args)
 
     def on_created(self, event):
